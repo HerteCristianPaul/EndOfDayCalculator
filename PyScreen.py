@@ -5,18 +5,18 @@ import sys
 class py_screen:
 
     def __init__(self):
-        print(colored('\n\nWelcome to EndOfDay Calculator\n', 'red', attrs=['bold']))
+        print(colored('\n\nWelcome to EndOfDay Calculator\n', 'cyan', attrs=['bold']))
         self.choiose_category()
 
     def choiose_category(self):
-        type = questionary.rawselect(
+        type = questionary.select(
             "What do you want to calculate?",
                 choices=[
                     "Deep Work",
                     "Target Completion",
                 ]).ask()
 
-        self.category = 0 if type == 0 else 1
+        self.category = 0 if type == 'Deep Work' else 1
         self.calculator_title()
 
     def calculator_title(self):
@@ -31,29 +31,45 @@ class py_screen:
         if self.category == 0:
             self.deep_work_input()
         elif self.category == 1:
-            self.percentage()
+            self.percentage_input()
 
     def deep_work_input(self):
         self.dp_inputs = []
         self.user_percentage = []
 
-        number_of_tasks = input(
-            colored("How many heavy tasks did you have: ", "cyan"))
+        while True:
+            text = input(
+                colored("How many tasks did you have (int): ", "blue"))
+
+            try:
+                number_of_tasks = int(text)
+                break
+            except ValueError:
+                print(colored("Invalid input. Please enter a valid number.", "red"))
 
         for i in range(number_of_tasks):
+            self.dp_inputs.append([])
+            self.user_percentage.append([])
             while True:
                 user_input = input(
-                    colored("How many minutes did you spend on the deep work tasks (or blank to stop): ", "cyan"))
+                    colored(f"How many minutes did you spend on the deep work task {i} (int) (or blank to stop): ", "blue"))
 
                 if user_input == "":
-                    self.user_percentage[i] = input(
-                        colored("What % of concentration did you got on the current task: ", "cyan"))
+                    while True:
+                        user_percentage = input(
+                            colored(f"What % of concentration did you got on the task {i} (int): ", "blue"))
+
+                        try:
+                            self.user_percentage[i] = int(user_percentage)
+                            break
+                        except:
+                            print(colored("Invalid input. Please enter a valid number.", "red"))
+
                     break
 
                 try:
                     number = int(user_input)
-                    numbers.append(number)
-                    self.dp_inputs[i].append(numbers)
+                    self.dp_inputs[i].append(number)
                 except ValueError:
                     print(colored("Invalid input. Please enter a valid number.", "red"))
 
@@ -69,39 +85,67 @@ class py_screen:
         hours = total_minutes // 60
         minutes = total_minutes % 60
 
-        print(colored("Deep Work: {hours}h{minutes}m", "red"))
+        print(colored(f"Deep Work: {hours}h{minutes}m", "green"))
         self.close_continue()
 
     def percentage_input(self):
-        light_tasks_total = input(
-            colored("How many light tasks did you have: ", "cyan"))
+        task_dict = {
+            'heavy_tasks_total': self.total_tasks('heavy'),
+            'light_tasks_total': self.total_tasks('light'),
+        }
 
-        heavy_tasks_total = input(
-            colored("How many heavy tasks did you have: ", "cyan"))
+        if task_dict['heavy_tasks_total'] == '':
+            task_dict['heavy_tasks_done'] = ''
+        else:
+            task_dict['heavy_tasks_done'] = self.done_tasks('heavy')
 
-        light_tasks_done = input(
-            colored("How many light tasks did you complete: ", "cyan"))
+        if task_dict['light_tasks_total'] == '':
+            task_dict['light_tasks_done'] = ''
+        else:
+            task_dict['light_tasks_done'] = self.done_tasks('light')
 
-        heavy_tasks_done = input(
-            colored("How many heavy tasks did you complete: ", "cyan"))
+        self.p_calculate(task_dict)
 
-        self.p_calculate(light_tasks_total, light_tasks_done, heavy_tasks_total, heavy_tasks_done)
+    def total_tasks(self, type):
+        while True:
+            input_tasks_total = input(
+                colored(f"How many {type} tasks did you have: ", "blue"))
 
-    def p_calculate(self, light_tasks_total, light_tasks_done, heavy_tasks_total, heavy_tasks_done):
-        light_tasks_remaining = light_tasks_total - light_tasks_done
-        heavy_tasks_remaining = heavy_tasks_total - heavy_tasks_done
+            if input_tasks_total == '':
+                return input_tasks_total
 
-        tasks_total = heavy_tasks_total + (2 * light_tasks_total)
-        tasks_remaining = heavy_tasks_remaining + (2 * light_tasks_remaining)
-        tasks_done = heavy_tasks_done + (2 * light_tasks_done)
+            try:
+                tasks_total = int(input_tasks_total)
+                return tasks_total
+            except:
+                print(colored("Invalid input. Please enter a valid number.", "red"))
 
+    def done_tasks(self, type):
+        while True:
+            input_tasks_done = input(
+                colored(f"How many {type} tasks did you complete: ", "blue"))
+
+            if input_tasks_done == '':
+                return input_tasks_done
+
+            try:
+                tasks_done = int(input_tasks_done)
+                return tasks_done
+            except:
+                print(colored("Invalid input. Please enter a valid number.", "red"))
+
+
+    def p_calculate(self, task_dict):
+        tasks_total = (2 * task_dict['heavy_tasks_total']) + task_dict['light_tasks_total']
+        tasks_done = (2 * task_dict['heavy_tasks_done']) + task_dict['light_tasks_done']
         percentage_completion = (tasks_done / tasks_total) * 100
 
-        print(colored("Target: {percentage_completion}%", "red"))
+        print(colored(f"Target: {percentage_completion}%", "green"))
+        self.close_continue()
 
     def close_continue(self):
         response = input(
-            colored("Perform another calculation (n / y): ", "cyan"))
+            colored("Perform another calculation (n / y): ", "yellow"))
 
         if response == 'n':
             sys.exit()
