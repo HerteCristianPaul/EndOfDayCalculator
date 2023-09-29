@@ -79,8 +79,11 @@ class py_screen:
         total_minutes = 0
         for i in range(number_of_tasks):
             time_per_task = sum(self.dp_inputs[i])
+            hours_per_task = time_per_task // 60
+            minutes_per_task = time_per_task % 60
             result = time_per_task * self.user_percentage[i] / 100
             total_minutes = total_minutes + result
+            print(colored(f"Task work{i}: {hours_per_task}h{minutes_per_task}m", "green"))
 
         hours = total_minutes // 60
         minutes = total_minutes % 60
