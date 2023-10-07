@@ -35,5 +35,6 @@ class PyScreen:
     def display_intel(self, data):
         print(colored(f'Total time: {data["general_info"]["total_time_today"]}', 'magenta'))
         print(colored(f'Total DeepWork time: {data["general_info"]["total_deep_work"]}', 'magenta'))
+        print(colored(f'Completion percentage: {data["general_info"]["completion"]}%', 'magenta'))
         for task in data['tasks']:
-            print(colored(f'Task: {task["task_name"]} took: {task["task_time"]}', 'blue'))
+            print(colored(f'Task {task["task_name"]} took: {task["task_time"]}', 'blue'))

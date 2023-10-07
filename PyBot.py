@@ -83,16 +83,28 @@ class PyBot:
         return elem.find_element(By.XPATH, 'div/div[1]/span/div/input').get_attribute('title')
 
     def is_deep_work(self, elem):
-        task_tags_span = elem.find_element(By.XPATH, 'div/div[3]/div/tag-names/div[2]/span')
-        task_tags = task_tags_span.find_elements(By.CLASS_NAME, 'ng-star-inserted')
+        task_tags = self.get_tags(elem)
         for tag in task_tags:
             if tag.text.strip().replace(',', '') == 'DeepWork':
                 return True
             else:
                 return False
 
+    def get_tags(self, elem):
+        task_tags_span = elem.find_element(By.XPATH, 'div/div[3]/div/tag-names/div[2]/span')
+        return task_tags_span.find_elements(By.CLASS_NAME, 'ng-star-inserted')
+
     def get_task_time(self, elem, route):
         return elem.find_element(By.XPATH, route).get_attribute('value')
+
+    def get_self_difficulty(self, elem):
+        task_tags = self.get_tags(elem)
+        for tag in task_tags:
+            cleaned_text = tag.text.strip().replace(',', '')
+            if cleaned_text in ('Easy', 'Medium', 'Hard'):
+                return cleaned_text
+
+        return None
 
     def task_creation(self, entries, timer_route):
         tasks = []
@@ -100,7 +112,8 @@ class PyBot:
             tasks.append({
                 'task_name': self.get_task_name(entry),
                 'is_deep_work': self.is_deep_work(entry),
-                'task_time': self.get_task_time(entry, timer_route)
+                'task_time': self.get_task_time(entry, timer_route),
+                'task_difficulty': self.get_self_difficulty(entry)
             })
 
         return tasks

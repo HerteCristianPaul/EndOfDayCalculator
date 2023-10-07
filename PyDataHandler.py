@@ -43,3 +43,39 @@ class PyDataHandler:
         deep_work_minutes = int(minutes % 60)
 
         return f'{deep_work_hours}:{deep_work_minutes}'
+
+    def completion_input(self, data):
+        for task in data['tasks']:
+            while True:
+                task_status_input = input(
+                    colored(f"Did you complete {task['task_name']} (y, n): ", "blue"))
+
+                if task_status_input.lower() == 'y':
+                    task['status'] = 'Done'
+                    break
+                elif task_status_input.lower() == 'n':
+                    task['status'] = 'Unfinished'
+                    break
+
+        return data
+
+    def process_data(self, data):
+        total_value = 0
+        done_value = 0
+        for task in data['tasks']:
+            if task['task_difficulty'] == 'Easy':
+                total_value += 1
+                if task['status'] == 'Done':
+                    done_value += 1
+            elif task['task_difficulty'] == 'Medium':
+                total_value += 2
+                if task['status'] == 'Done':
+                    done_value += 2
+            elif task['task_difficulty'] == 'Hard':
+                total_value += 3
+                if task['status'] == 'Done':
+                    done_value += 3
+
+        data['general_info']['completion'] = (done_value / total_value) * 100
+
+        return data

@@ -75,13 +75,14 @@ def scraper():
     py_bot = PyBot(login_credentials, driver)
     py_bot.open_page()
     py_bot.login()
-    data = py_bot.extract_intel()
+    extracted_data = py_bot.extract_intel()
     py_bot.close_browser()
     py_data_handler = PyDataHandler()
-    intel = py_data_handler.deep_work_input(data)
-    pprint.pprint(intel)
+    data = py_data_handler.deep_work_input(extracted_data)
+    data = py_data_handler.completion_input(data)
+    data = py_data_handler.process_data(data)
     py_screen = PyScreen()
-    py_screen.display_intel(intel)
+    py_screen.display_intel(data)
 
 
 if __name__ == "__main__":
