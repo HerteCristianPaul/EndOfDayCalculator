@@ -21,3 +21,5 @@ __pycache__/*
 pyvenv.cfg
 
 *.csv
+chromedriver.exe
+LICENSE.chromedriver
