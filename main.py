@@ -7,7 +7,6 @@ from PyBot import PyBot
 from PyDataHandler import PyDataHandler
 import sys
 from termcolor import colored
-import pprint
 
 
 def main():
